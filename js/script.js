@@ -1,16 +1,7 @@
 /*
-/// credits to three.js webgl 3d sounds example  : https://threejs.org/examples/#misc_sound
-/// credits to recorder.js : https://github.com/mattdiamond/Recorderjs
-
-
-// to do 
-- funcion constructora de objetos ( record, sound spacialization & three js)
-- cambiar controles a unos mas basicos (flechitas y mouse, dejando el click libre)
-- click en grid three js para posicionamiento de sonidos (x y)
-- cuando se graba , lo demas se mutea 
-- limite de grabacion 3 s .
+** credits to three.js webgl 3d sounds example  : https://threejs.org/examples/#misc_sound
+** credits to recorder.js : https://github.com/mattdiamond/Recorderjs
 */
-
 
 // funcionamiento landing page 
 var landing = document.querySelector("#landing");
@@ -50,19 +41,22 @@ var sound1, sound2;
 var currentPosition = (0,0,0);
 var limit;
 
-
+let audioRecorder;
+let mediaRecorder;
+let shouldStop = false;
+let stopped = false;
 
 
 function cambioEstilo(){		
-		 container.style.visibility="visible";
-		 landing.style.display="none";
-		 controles.style.visibility="visible";
+	container.style.visibility="visible";
+	landing.style.display="none";
+	controles.style.visibility="visible";
 };
 
 function info(){
-		 container.style.visibility="hidden";
-		 landing.style.display="block";
-		 controles.style.visibility="hidden";
+	container.style.visibility="hidden";
+	landing.style.display="block";
+	controles.style.visibility="hidden";
 };
 
 function mute(){
@@ -71,13 +65,11 @@ function mute(){
 		muted = true;
 		muteBtn.classList.remove('fa-volume-up');
 		muteBtn.classList.add('fa-volume-off');
-		console.log(muted);
 	} else if (muted == true) {
 		mixer.gain.value = 1;
 		muted = false;
 		muteBtn.classList.remove('fa-volume-off');
 		muteBtn.classList.add('fa-volume-up');
-		console.log(muted);
 	}
 }
 
@@ -93,48 +85,57 @@ function toggleView(){
 		view = false;
 		toggleBtn.classList.remove('fa-thermometer-full');
 		toggleBtn.classList.add('fa-thermometer-empty');
-
 	}
 }
 
 // ----------  funciones de recorder js --------
 function __log(e, data) {
-    log.innerHTML += "\n" + e + " " + (data || '');
- }
+	log.innerHTML += "\n" + e + " " + (data || '');
+}
 
- function startUserMedia(stream) {
-    var input = audioCtx.createMediaStreamSource(stream);
-    __log('Media stream created.');
-    recorder = new Recorder(input);
-    __log('Recorder initialised.');
+let recordedChunks = [];
+function startUserMedia(stream) {
+	var input = audioCtx.createMediaStreamSource(stream);
+	mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
+	mediaRecorder.addEventListener('dataavailable', function(e) {
+		console.log('data available?', e);
+		if (e.data.size > 0) {
+			recordedChunks.push(e.data);
+		}
+	
+		if(shouldStop === true && stopped === false) {
+			console.log('stopped')
+			createSoundObject(currentPosition, new Blob(recordedChunks));
+			stopped = true;
+			mixer.gain.value = 1;
+		}
+		// might need this later
+		// mediaRecorder.addEventListener('stop', function() {
+		// 	console.log('we are here', recordedChunks);
+		// 	createSoundObject(currentPosition, new Blob(recordedChunks));
+		// 	recordedChunks = [];
+		// }); 
+	});
+}
 
- }
 
-
-
-
- function startRecordingSound(button) {
-    recorder && recorder.record();
+function startRecordingSound(button) {
+	recordedChunks = [];
+	stopped = false;
+	shouldStop = false;
     button.disabled = true;
+	mediaRecorder.start();
     button.classList.add('active');
     button.nextElementSibling.disabled = false;
-    __log('Recording...');
     mixer.gain.value = 0;
-
- }
+}
 
  function stopRecordingSound(button) {
-    recorder && recorder.stop();
+	mediaRecorder.stop();
+	shouldStop = true;
     button.disabled = true;
     button.previousElementSibling.disabled = false;
     button.previousElementSibling.classList.remove('active');
-    __log('Stopped recording.');
-    
-    // create WAV sound object 
-    createSoundObject(currentPosition);
-  
-    recorder.clear();
-    mixer.gain.value = 1;
  }
 
 ////  funcion para descargar sonidos --------------------------
@@ -163,24 +164,28 @@ var Sound = function ( sources, volume , x, y , z ) {
 		var source = document.createElement( 'source' );
 		source.src = sources[ i ];
 		audio.appendChild( source );
+		audio.setAttribute('loop', true);
 	}
 
 	var request = new XMLHttpRequest();
 	request.open("GET", sources, true);
 	request.responseType = "arraybuffer";
 	request.onload = function(e) {
-	  	// Create a buffer from the response ArrayBuffer.
-	  	audioCtx.decodeAudioData(this.response, function onSuccess(buffer) {
-		    sound.buffer = buffer;
+		console.log('e', e);
 
-		    // Make the sound source use the buffer and start playing it.
-		    sound.source.buffer = sound.buffer;
-		    sound.source.start(audioCtx.currentTime);
-		    console.log("play");
-		    console.log(sound.buffer);
-	  	}, function onFailure() {
-	    	alert("Decoding the audio buffer failed");
-	  	});
+		console.log(this.response);
+		console.log(sound);
+		console.log(sources);
+	  	// Create a buffer from the response ArrayBuffer.
+	  	// audioCtx.decodeAudioData(this.response, function onSuccess(buffer) {
+		// 	sound.buffer = buffer;
+		//     // Make the sound source use the buffer and start playing it.
+		// 	sound.source.buffer = sound.buffer;
+		//     sound.source.start(audioCtx.currentTime);
+		//     console.log('on here', sound.buffer);
+	  	// }, function onFailure(error) {
+			
+	  	// });
 	};
 	request.send();
 
@@ -189,7 +194,7 @@ var Sound = function ( sources, volume , x, y , z ) {
 		audio.play();
 	}
 	var sound = {};
-	sound.source = audioCtx.createBufferSource(audio);
+	sound.source = audioCtx.createMediaElementSource(audio);
 	sound.volume = audioCtx.createGain();
 	sound.panner = audioCtx.createPanner();
 	sound.panner.distanceModel = "exponential";
@@ -197,10 +202,22 @@ var Sound = function ( sources, volume , x, y , z ) {
 	sound.panner.refDistance = 2.5;
 	sound.panner.maxDistance = 500;
 
+	console.log("source", sound.source)
 	
 	sound.source.connect(sound.volume);
 	sound.volume.connect(sound.panner);
 	sound.panner.connect(mixer);
+
+	console.log(audioCtx);
+
+	if(audioCtx.state === 'suspended') {
+		audioCtx.resume().then(function() {
+			// audio.play();
+			// sound.source.mediaElement.play();
+		});  
+	}
+	console.log(audioCtx);
+
 
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
@@ -209,25 +226,21 @@ var Sound = function ( sources, volume , x, y , z ) {
 	var esfera = new THREE.Mesh( new THREE.SphereGeometry(5, 32, 32),material);
 	esfera.position.set(x,y+2,z);
 	scene.add(esfera);
-
 }
 
 
 
 /// Creacion de objeto sound a partir de la grabacion 
-function createSoundObject(position) {
-    recorder && recorder.exportWAV(function(blob) {
+function createSoundObject(position, blob) {
+    // recorder && recorder.exportWAV(function(blob) {
 	    var url = URL.createObjectURL(blob);
 
 	    var sound ;
-	     sound = new Sound( [ url ],  1 , camera.position.x , camera.position.y, camera.position.z);
-		
-	     sound.play();
-	     sonidos.push(sound);
-
-
-       
-    });
+		sound = new Sound( [ url ],  1 , camera.position.x , camera.position.y, camera.position.z);
+	
+		sound.play();
+		sonidos.push(sound);       
+    // });
   }
 
 function init() {
