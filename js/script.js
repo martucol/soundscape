@@ -30,7 +30,7 @@ var recorder;
 /// create streamDestinationNode and Media Recorder for download
 var streamDest, mediaRec;
 var esferas = {};
-var bola;
+var sphere;
 // variables a modificar 
 var light, pointLight, ambientLight;
 var mesh, bulbMat;
@@ -75,13 +75,13 @@ function mute(){
 
 function toggleView(){
 	if (view == false) {
-		scene.add(bola) ;
+		scene.add(sphere) ;
 		view = true;
 		toggleBtn.classList.remove("fa-thermometer-empty");
 		toggleBtn.classList.add('fa-thermometer');
 
 	} else if (view == true) {
-		scene.remove(bola);
+		scene.remove(sphere);
 		view = false;
 		toggleBtn.classList.remove('fa-thermometer-full');
 		toggleBtn.classList.add('fa-thermometer-empty');
@@ -98,20 +98,17 @@ function startUserMedia(stream) {
 	var input = audioCtx.createMediaStreamSource(stream);
 	mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
 	mediaRecorder.addEventListener('dataavailable', function(e) {
-		console.log('data available?', e);
 		if (e.data.size > 0) {
 			recordedChunks.push(e.data);
 		}
 	
 		if(shouldStop === true && stopped === false) {
-			console.log('stopped')
 			createSoundObject(currentPosition, new Blob(recordedChunks));
 			stopped = true;
 			mixer.gain.value = 1;
 		}
 		// might need this later
 		// mediaRecorder.addEventListener('stop', function() {
-		// 	console.log('we are here', recordedChunks);
 		// 	createSoundObject(currentPosition, new Blob(recordedChunks));
 		// 	recordedChunks = [];
 		// }); 
@@ -143,16 +140,12 @@ function startRecordingPath(button) {
     mediaRec.startRecording();
     button.disabled = true;
     button.nextElementSibling.disabled = false;
-    console.log("started recording path");
-
  }
 
  function stopRecordingPath(button) {
   	mediaRec.finishRecording();
     button.disabled = true;
-    button.previousElementSibling.disabled = false;
-    console.log("stopped recording path");
-   
+    button.previousElementSibling.disabled = false;   
  }
 
 
@@ -171,18 +164,12 @@ var Sound = function ( sources, volume , x, y , z ) {
 	request.open("GET", sources, true);
 	request.responseType = "arraybuffer";
 	request.onload = function(e) {
-		console.log('e', e);
-
-		console.log(this.response);
-		console.log(sound);
-		console.log(sources);
 	  	// Create a buffer from the response ArrayBuffer.
 	  	// audioCtx.decodeAudioData(this.response, function onSuccess(buffer) {
 		// 	sound.buffer = buffer;
 		//     // Make the sound source use the buffer and start playing it.
 		// 	sound.source.buffer = sound.buffer;
 		//     sound.source.start(audioCtx.currentTime);
-		//     console.log('on here', sound.buffer);
 	  	// }, function onFailure(error) {
 			
 	  	// });
@@ -201,14 +188,10 @@ var Sound = function ( sources, volume , x, y , z ) {
 	sound.panner.coneInnerAngle = 360;
 	sound.panner.refDistance = 2.5;
 	sound.panner.maxDistance = 500;
-
-	console.log("source", sound.source)
 	
 	sound.source.connect(sound.volume);
 	sound.volume.connect(sound.panner);
 	sound.panner.connect(mixer);
-
-	console.log(audioCtx);
 
 	if(audioCtx.state === 'suspended') {
 		audioCtx.resume().then(function() {
@@ -216,14 +199,16 @@ var Sound = function ( sources, volume , x, y , z ) {
 			// sound.source.mediaElement.play();
 		});  
 	}
-	console.log(audioCtx);
-
 
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
 	var material = new THREE.MeshLambertMaterial({color: 0x000000});
-	material.color.setHSL(Math.random() , 0.2, 0.5 );
-	var esfera = new THREE.Mesh( new THREE.SphereGeometry(5, 32, 32),material);
+	var colorete = new THREE.Color(0x3300ff);
+	colorete.setHSL(Math.random(), 0.2, 0.5);
+	this.customMaterial = shadermaterial.clone();
+	this.customMaterial.fragmentShader = document.getElementById('sphereFragmentShader').textContent
+	this.customMaterial.uniforms.color.value = new THREE.Vector3(colorete.r, colorete.g, colorete.b);
+	var esfera = new THREE.Mesh( new THREE.SphereGeometry(5, 32, 32), this.customMaterial);
 	esfera.position.set(x,y+2,z);
 	scene.add(esfera);
 }
@@ -244,8 +229,6 @@ function createSoundObject(position, blob) {
   }
 
 function init() {
-
-	// set up basico audio context
 	 try {
       // webkit shim
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -264,20 +247,20 @@ function init() {
       __log('No live audio input: ' + e);
     });
 
-    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-     mixer = audioCtx.createGain();
-     mixer.connect(audioCtx.destination);
-    /*
+	
+	mixer = audioCtx.createGain();
+	mixer.connect(audioCtx.destination);
+	/*
     streamDest = audioCtx.createMediaStreamDestination();
-   
+	
     mixer.connect(streamDest);
     streamDest.connect(audioCtx.destination);
     mediaRec = new WebAudioRecorder(mixer, { workerDir: "build/"});
     */
+   
+   	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-
-	// set up basico de la escena
+	// Basic scene setup
 	container = document.getElementById( 'container' );
 	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.set( 0, 25, 0 );
@@ -288,35 +271,33 @@ function init() {
 	controls.lookVertical = false; 
 	scene = new THREE.Scene();
 	scene.fog = new THREE.FogExp2( 0x000000, 0.0015 );
-
-
-	// luz general
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
 	scene.add( light );
-
 	ambientLight = new THREE.AmbientLight( 0xff5555 , 0.5);
 	scene.add(ambientLight);
-	// objeto lumínico y sonoro ( esto va a la función )
 	
-	// ground
-	// quizas sirva más este para seleccionar coordenadas
 	shadermaterial = new THREE.ShaderMaterial({side: THREE.DoubleSide,
-						uniforms: { amp: {
-										type: "f",
-										value: 0.0
-									},
-									sync:{
-										type: "f",
-										value: 0.0
-									},
-						            time: { //float initialized to 0
-						                type: "f",
-						                value: 0.0
-					             	 }
-			            },
-			            vertexShader: document.getElementById('vertexShader2').textContent,
-			            fragmentShader: document.getElementById('fragmentShader2').textContent
+		uniforms: { 
+			amp: {
+				type: "f",
+				value: 0.0
+			},
+			sync:{
+				type: "f",
+				value: 0.0
+			},
+			time: { 
+				type: "f",
+				value: 0.1
+			},
+			color: {
+				type: "v3",
+				value: new THREE.Color(0xff0000)
+			}
+		},
+		vertexShader: document.getElementById('vertexShader2').textContent,
+		fragmentShader: document.getElementById('fragmentShader2').textContent
 	} );
 
 	var material_wireframe = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 10 } );
@@ -326,7 +307,7 @@ function init() {
 	mesh.position.y = 0.1;
 	mesh.rotation.x = - Math.PI /2;
 
-	bola = new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 32), shadermaterial);
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 32), shadermaterial);
 
 	var grid = new THREE.GridHelper( 500, 25 );
 	grid.setColors( 0xffaaff, 0xffaaff );
@@ -337,14 +318,12 @@ function init() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	container.innerHTML = "";
 	container.appendChild( renderer.domElement );
-	//
+
 	window.addEventListener( 'resize', onWindowResize, false );
 	muted = false; 
 	view = false;
 	limit = 500;
 }
-
-
 
 function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -352,12 +331,14 @@ function onWindowResize() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	controls.handleResize();
 }
+
 function animate() {
 	requestAnimationFrame( animate );
 	render();
 }
+
 function render() {
-	var delta = clock.getDelta(),
+	let delta = clock.getDelta(),
 		time = clock.getElapsedTime() * 5;
 	controls.update( delta );
 	renderer.render( scene, camera );
@@ -383,7 +364,6 @@ function render() {
 	shadermaterial.uniforms[ 'time' ].value = .0005 * ( Date.now() - start );
 	shadermaterial.uniforms[ 'amp' ].value = ( Date.now() - start ) / 70 ;
 
-
 	var m = camera.matrix;
 
 	var mx = m.elements[12], my = m.elements[13], mz = m.elements[14];
@@ -405,25 +385,7 @@ function render() {
 	m.elements[12] = mx;
 	m.elements[13] = my;
 	m.elements[14] = mz;
-
-
 }
-
-/*
-
-var n = 20;
-var objects = [];
-
-function creadora(posicion, url) {
-	var objeto = {}.
-	objeto.x =
-	objeto.y =
-	objeto.url = etc
-
-	objects.push(objeto)
-}
-
-*/
 
 
 init();

@@ -264,6 +264,17 @@
 
         }
         </script>
+        <script type="x-shader/x-vertex" id="sphereFragmentShader">
+            varying vec2 vUv;
+            varying float noise;
+            uniform float time;
+            uniform vec3 color;
+
+            void main() {
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        </script>
         <script type="x-shader/x-vertex" id="fragmentShader2">
             varying vec2 vUv;
             varying float noise;
