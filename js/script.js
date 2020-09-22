@@ -147,10 +147,8 @@ function startRecordingPath(button) {
     button.disabled = true;
     button.previousElementSibling.disabled = false;   
  }
+//// fin funcion para descargar sonidos 
 
-
-
-//función de reproducción de sonido en el espacio
 var Sound = function ( sources, volume , x, y , z ) {
 	var audio = document.createElement( 'audio' );
 	for ( var i = 0; i < sources.length; i ++ ) {
@@ -159,22 +157,6 @@ var Sound = function ( sources, volume , x, y , z ) {
 		audio.appendChild( source );
 		audio.setAttribute('loop', true);
 	}
-
-	var request = new XMLHttpRequest();
-	request.open("GET", sources, true);
-	request.responseType = "arraybuffer";
-	request.onload = function(e) {
-	  	// Create a buffer from the response ArrayBuffer.
-	  	// audioCtx.decodeAudioData(this.response, function onSuccess(buffer) {
-		// 	sound.buffer = buffer;
-		//     // Make the sound source use the buffer and start playing it.
-		// 	sound.source.buffer = sound.buffer;
-		//     sound.source.start(audioCtx.currentTime);
-	  	// }, function onFailure(error) {
-			
-	  	// });
-	};
-	request.send();
 
 	this.position = new THREE.Vector3();
 	this.play = function () {
@@ -194,15 +176,11 @@ var Sound = function ( sources, volume , x, y , z ) {
 	sound.panner.connect(mixer);
 
 	if(audioCtx.state === 'suspended') {
-		audioCtx.resume().then(function() {
-			// audio.play();
-			// sound.source.mediaElement.play();
-		});  
+		audioCtx.resume();
 	}
 
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
-	var material = new THREE.MeshLambertMaterial({color: 0x000000});
 	var colorete = new THREE.Color(0x3300ff);
 	colorete.setHSL(Math.random(), 0.2, 0.5);
 	this.customMaterial = shadermaterial.clone();
@@ -213,55 +191,48 @@ var Sound = function ( sources, volume , x, y , z ) {
 	scene.add(esfera);
 }
 
-
-
-/// Creacion de objeto sound a partir de la grabacion 
 function createSoundObject(position, blob) {
-    // recorder && recorder.exportWAV(function(blob) {
-	    var url = URL.createObjectURL(blob);
-
-	    var sound ;
-		sound = new Sound( [ url ],  1 , camera.position.x , camera.position.y, camera.position.z);
-	
-		sound.play();
-		sonidos.push(sound);       
-    // });
-  }
+	var url = URL.createObjectURL(blob);
+	var sound = new Sound( [ url ], 1, camera.position.x , camera.position.y, camera.position.z);
+	sound.play();
+	sonidos.push(sound);       
+}
 
 function init() {
-	 try {
-      // webkit shim
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                       navigator.mozGetUserMedia;
-      window.URL = window.URL || window.webkitURL;
-      
-      audioCtx = new AudioContext;
-      __log('Audio context set up.');
-      __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
-    } catch (e) {
-      alert('No web audio support in this browser!');
-    }
+	/**  check compatibility for audio and graphics **/
+	try {
+		// webkit shim
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+						navigator.mozGetUserMedia;
+		window.URL = window.URL || window.webkitURL;
+		
+		audioCtx = new AudioContext;
+		__log('Audio context set up.');
+		__log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+	} catch (e) {
+		alert('No web audio support in this browser!');
+	}
+
+	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
     
     navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
       __log('No live audio input: ' + e);
     });
-
 	
 	mixer = audioCtx.createGain();
 	mixer.connect(audioCtx.destination);
-	/*
-    streamDest = audioCtx.createMediaStreamDestination();
 	
-    mixer.connect(streamDest);
-    streamDest.connect(audioCtx.destination);
-    mediaRec = new WebAudioRecorder(mixer, { workerDir: "build/"});
-    */
-   
-   	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	createScene();
+	
+	muted = false; 
+	view = false;
+	limit = 500;
+}
 
-	// Basic scene setup
-	container = document.getElementById( 'container' );
+function createScene() {
+	container = document.getElementById('container');
 	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.set( 0, 25, 0 );
 	controls = new THREE.FirstPersonControls( camera );
@@ -299,15 +270,12 @@ function init() {
 		vertexShader: document.getElementById('vertexShader2').textContent,
 		fragmentShader: document.getElementById('fragmentShader2').textContent
 	} );
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 32), shadermaterial);
 
 	var material_wireframe = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 10 } );
-	//material_wireframe.color.setHSL( 0.1, 0.2, 0.5 );
-	
 	mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 50, 50 ), material_wireframe );
 	mesh.position.y = 0.1;
 	mesh.rotation.x = - Math.PI /2;
-
-	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 32), shadermaterial);
 
 	var grid = new THREE.GridHelper( 500, 25 );
 	grid.setColors( 0xffaaff, 0xffaaff );
@@ -320,9 +288,6 @@ function init() {
 	container.appendChild( renderer.domElement );
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	muted = false; 
-	view = false;
-	limit = 500;
 }
 
 function onWindowResize() {
@@ -338,8 +303,8 @@ function animate() {
 }
 
 function render() {
-	let delta = clock.getDelta(),
-		time = clock.getElapsedTime() * 5;
+	let delta = clock.getDelta();
+	let	time = clock.getElapsedTime() * 5;
 	controls.update( delta );
 	renderer.render( scene, camera );
 	audioCtx.listener.setPosition(camera.position.x, camera.position.y, camera.position.z);
