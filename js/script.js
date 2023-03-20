@@ -16,6 +16,9 @@ var toggleBtn = document.querySelector("#toggleFav");
 container.style.visibility="hidden";
 controles.style.visibility="hidden";
 
+// //only for debugging
+// landing.style.display="none";
+
 // declaración de variables básicas 
 var start = Date.now()
 var muted, view;
@@ -178,11 +181,13 @@ var Sound = function ( sources, volume , x, y , z ) {
 	if(audioCtx.state === 'suspended') {
 		audioCtx.resume();
 	}
+	const fullpallete = [0xfb29ff, 0xff2ea1, 0xff7866, 0xff6505, 0xffca42, 0xd3ff42, 0x66ff9, 0x0ed8a2, 0x0db4ce, 0x0461f6, 0xba7ef6];
 
+	const pallete = [0xfb29ff, 0xff2ea1, 0xff7866, 0xf5e214, 0x0db4ce, 0x0461f6];
+	  
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
-	var colorete = new THREE.Color(0x3300ff);
-	colorete.setHSL(Math.random(), 0.2, 0.5);
+	var colorete = new THREE.Color(pallete[Math.floor(Math.random() * pallete.length)]);
 	this.customMaterial = shadermaterial.clone();
 	this.customMaterial.fragmentShader = document.getElementById('sphereFragmentShader').textContent
 	this.customMaterial.uniforms.color.value = new THREE.Vector3(colorete.r, colorete.g, colorete.b);
@@ -241,7 +246,7 @@ function createScene() {
 	controls.noFly = true;
 	controls.lookVertical = false; 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0x000000, 0.0015 );
+	scene.fog = new THREE.FogExp2( 0xffaaff, 0.0015 );
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
 	scene.add( light );
@@ -270,7 +275,7 @@ function createScene() {
 		vertexShader: document.getElementById('vertexShader2').textContent,
 		fragmentShader: document.getElementById('fragmentShader2').textContent
 	} );
-	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 32), shadermaterial);
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 100, 100), shadermaterial);
 
 	var material_wireframe = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 10 } );
 	mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 50, 50 ), material_wireframe );
@@ -278,7 +283,7 @@ function createScene() {
 	mesh.rotation.x = - Math.PI /2;
 
 	var grid = new THREE.GridHelper( 500, 25 );
-	grid.setColors( 0xffaaff, 0xffaaff );
+	grid.setColors( 0xffffff, 0xffffff );
 	scene.add( grid );
 	
 	// renderer setup and adding to HTML

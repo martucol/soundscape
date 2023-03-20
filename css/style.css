@@ -3,7 +3,6 @@ body {
 	margin:auto;
 	overflow: hidden;
 	font-size: 16px;
-	font-family: Courier, monospace;
 	text-align: center;
 	color: white;
 	box-sizing: border-box;
@@ -12,6 +11,9 @@ body {
 * {outline: 1px solid red !important;}
 */
 
+* {
+	font-family: monospace;
+}
 
 /*landing page*/
 
