@@ -255,7 +255,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
   function contextmenu( event ) {
 
-    event.preventDefault();
+    // event.preventDefault();
 
   }
 

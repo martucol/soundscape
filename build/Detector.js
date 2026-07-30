@@ -40,7 +40,7 @@ Detector = {
 
 		var style = message.style;
 
-		style.fontFamily = "monospace";
+		style.fontFamily = "Fragment mono";
 		style.fontSize = "13px";
 		style.textAlign = "center";
 		style.background = "#eee";

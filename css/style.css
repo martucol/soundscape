@@ -1,18 +1,16 @@
 body {
-	background-color: #000000;
+	background-color: #CCE0CC;
 	margin:auto;
 	overflow: hidden;
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
-	color: white;
+	color: var(--color-foreground);
 	box-sizing: border-box;
+	--color-foreground: #2C202C
 }
-/*
-* {outline: 1px solid red !important;}
-*/
 
 * {
-	font-family: monospace;
+	font-family: "Fragment mono", monospaced;
 }
 
 /*landing page*/
@@ -23,13 +21,19 @@ p {
 
 button:hover {
 	cursor:pointer;
+	transform: scale(1.1);
 }
 
 #landing {
 	width: 50%;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	text-align: center;
 	margin: auto;
-	margin-top: 120px;
+	background: #CCE0CC;
 }
 	
 a {
@@ -40,11 +44,9 @@ a {
 #log {display: none;}
 
 #comenzar  {
-	background: black;
-	color: white;
+	background: #CCE0CC;
+	color: var(--color-foreground);
 	text-align: center;
-	font-size: 20px; 
-	font-weight: bold;
 	padding: 5px 10px;
 	margin-top: 20px;
 	transition: all 500ms;
@@ -63,7 +65,7 @@ a {
 	top: 10px; 
 	width: 100%;
 	z-index:100;
-	border-bottom: 1px solid white;
+	border-bottom: 1px solid var(--color-foreground);
 	padding: 1px 20px;
     margin: auto;
     display: flex;
@@ -95,13 +97,16 @@ a {
 
 .boton {
 	border: 0px;	
-	background: black;
-	color:white;
+	background: #CCE0CC;
+	color:var(--color-foreground);
 	text-align: center;
-	font-size: 21px; 
 	transition: all 300ms;
 	margin-bottom:0;
 	padding: 5;
+	transition: all 300ms ease-in;
+}
+.boton--icono {
+	font-size: 20px;
 }
 
 button i {
@@ -115,7 +120,7 @@ button i {
 }
 
 #stopRecordingPath{
-	color: white;
+	color: var(--color-foreground);
 	border-radius: 5%;
 	padding: 4px 6px;
 	/*float: left;
@@ -123,7 +128,7 @@ button i {
 }
 
 #stopRecordingPath2{
-	color: white;
+	color: var(--color-foreground);
 	border-radius: 100%;
 	padding: 4px 6px;
 	margin-left: 10px;
@@ -137,7 +142,7 @@ button i {
 }
 
 #stop{
-	color: white;
+	color: var(--color-foreground);
 	border-radius: 5%;
 	padding: 4px 6px;
 }
@@ -145,20 +150,20 @@ button i {
 #record.active {
 	border: 0px solid red;
 	background-color: red;
-    color: black;
+    color: var(--color-foreground);
 } 
 
 
 #info {
-	color: white;
+	color: var(--color-foreground);
 	border-radius: 5%;
 }
 
 #muteSound{
-	color: white;
+	color: var(--color-foreground);
 	border-radius: 5%;
 	padding: 4px 5px;
-	border:2px solid black;
+	border:2px solid var(--color-foreground);
 }
 
 

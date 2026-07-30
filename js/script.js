@@ -246,7 +246,7 @@ function createScene() {
 	controls.noFly = true;
 	controls.lookVertical = false; 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xffaaff, 0.0015 );
+	scene.fog = new THREE.FogExp2( 0xCCE0CC, 0.0025 );
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
 	scene.add( light );
@@ -283,12 +283,13 @@ function createScene() {
 	mesh.rotation.x = - Math.PI /2;
 
 	var grid = new THREE.GridHelper( 500, 25 );
-	grid.setColors( 0xffffff, 0xffffff );
+	grid.setColors( 0x2C202C, 0x2C202C );
 	scene.add( grid );
 	
 	// renderer setup and adding to HTML
-	renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: true } );
+	renderer = new THREE.WebGLRenderer( { clearColor: 0xCCE0CC, clearAlpha: 1, antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor( 0xCCE0CC, 1 );
 	container.innerHTML = "";
 	container.appendChild( renderer.domElement );
 

@@ -4,7 +4,10 @@
 		<title>soundscape</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
@@ -16,10 +19,10 @@
  			<p>R / F - Up / Down</p>
 			<p><button disabled id="record" class="boton"><i class="fa fa-circle" aria-hidden="true"></i></button> - Start Recording </p>
 			<p><button disabled id="stop" class="boton"><i class=" fa fa-stop" aria-hidden="true"></i></button> - Stop Recording </p>
-			<p>Once you finish recording it will be looped in the place</p>
-			<p>For a better experience use headphones :)</p>
-			<p>For the development of this site was used <a href="https://threejs.org/examples/#misc_sound">three.js</a> and 
-			<a href="https://github.com/mattdiamond/Recorderjs">recorder.js</a></p>
+			<p>Once you finish recording, the recorded sound will stay looping in that place.</p>
+			<p>Use headphones for a better experience :)</p>
+			<p>This site was built by <a href="https://mariamartina.com"  target="_blank">maria martina</a> using <a href="https://threejs.org/examples/#misc_sound" target="_blank">three.js</a> and 
+			<a href="https://github.com/mattdiamond/Recorderjs" target="_blank">recorder.js</a></p>
 
 			<button onclick="cambioEstilo()" id="comenzar"> Start </button>
  		</div >
@@ -31,18 +34,18 @@
 				<button onclick="stopRecordingPath(this)"  class="boton"  id="stopRecordingPath"><i class="fa fa-pause" aria-hidden="true"></i></button>  
 				<p >Start/Stop Recording Path</p> 
 				-->
-				<button onclick="toggleView(this)" class="boton" ><i id="toggleFav" class="fa fa-thermometer-empty" aria-hidden="true"></i></button>
+				<button onclick="toggleView(this)" class="boton  boton--icono" ><i id="toggleFav" class="fa fa-thermometer-empty" aria-hidden="true"></i></button>
 				<p> Toggle View </p>
 			</div>
 			
 			<div class="seccion">
-				<button onclick="startRecordingSound(this)"  class="boton" id="record"><i class="fa fa-circle" aria-hidden="true"></i></button>
-		  		<button onclick="stopRecordingSound(this)" class="boton"  id="stop"><i class=" fa fa-stop" aria-hidden="true"></i></button>
+				<button onclick="startRecordingSound(this)"  class="boton  boton--icono" id="record"><i class="fa fa-circle" aria-hidden="true"></i></button>
+		  		<button onclick="stopRecordingSound(this)" class="boton  boton--icono"  id="stop"><i class=" fa fa-stop" aria-hidden="true"></i></button>
 		  		<p >Start/Stop Recording Sound</p>
 	  		</div>
 	  		<div class="seccion">
-		  		<button onclick="info()" class="boton" id="info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>
-		  		<button onclick="mute(this)" class="boton" id="muteBtn" ><i id="muteFav" class="fa fa-volume-up"  aria-hidden="true"></i></button>
+		  		<button onclick="info()" class="boton boton--icono" id="info"><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+		  		<button onclick="mute(this)" class="boton boton--icono" id="muteBtn" ><i id="muteFav" class="fa fa-volume-up"  aria-hidden="true"></i></button>
 		  		<p> Mute / Info</p>
 	  		</div>
 	  	</div>
