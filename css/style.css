@@ -19,10 +19,7 @@ p {
 	cursor: default;
 }
 
-button:hover {
-	cursor:pointer;
-	transform: scale(1.1);
-}
+
 
 #landing {
 	width: 50%;
@@ -39,8 +36,22 @@ button:hover {
 a {
 	text-decoration: none;
 	font-weight: bold;
-	color:#0078ff;
+	color:#384c63;
 }
+
+a, button {
+	letter-spacing: 0;
+	transition: letter-spacing 400ms linear;
+
+}
+
+button:hover {
+	cursor:pointer;
+}
+button:not(.boton--icono):hover, a:hover {
+	letter-spacing: 0.3em;
+}
+
 #log {display: none;}
 
 #comenzar  {

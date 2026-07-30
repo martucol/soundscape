@@ -1,6 +1,7 @@
 /*
 ** credits to three.js webgl 3d sounds example  : https://threejs.org/examples/#misc_sound
 ** credits to recorder.js : https://github.com/mattdiamond/Recorderjs
+** SVG version — no shaders, plain spheres
 */
 
 // funcionamiento landing page 
@@ -37,7 +38,6 @@ var sphere;
 // variables a modificar 
 var light, pointLight, ambientLight;
 var mesh, bulbMat;
-var shadermaterial;
 var material_sphere1, material_sphere2;
 var sonidos = [];
 var sound1, sound2;
@@ -110,11 +110,6 @@ function startUserMedia(stream) {
 			stopped = true;
 			mixer.gain.value = 1;
 		}
-		// might need this later
-		// mediaRecorder.addEventListener('stop', function() {
-		// 	createSoundObject(currentPosition, new Blob(recordedChunks));
-		// 	recordedChunks = [];
-		// }); 
 	});
 }
 
@@ -152,23 +147,6 @@ function startRecordingPath(button) {
  }
 //// fin funcion para descargar sonidos 
 
-function makeGlowTexture( hexColor ) {
-	var c = document.createElement('canvas');
-	c.width = c.height = 128;
-	var ctx = c.getContext('2d');
-	var col = new THREE.Color( hexColor );
-	var r = Math.round(col.r*255), g = Math.round(col.g*255), b = Math.round(col.b*255);
-	var grad = ctx.createRadialGradient(64,64,0, 64,64,64);
-	grad.addColorStop(0.0, 'rgba('+r+','+g+','+b+',1)');
-	grad.addColorStop(0.2, 'rgba('+r+','+g+','+b+',0.9)');
-	grad.addColorStop(1.0, 'rgba('+r+','+g+','+b+',0)');
-	ctx.fillStyle = grad;
-	ctx.fillRect(0,0,128,128);
-	var tex = new THREE.Texture(c);
-	tex.needsUpdate = true;
-	return tex;
-}
-
 var Sound = function ( sources, volume , x, y , z ) {
 	var audio = document.createElement( 'audio' );
 	for ( var i = 0; i < sources.length; i ++ ) {
@@ -200,32 +178,16 @@ var Sound = function ( sources, volume , x, y , z ) {
 	}
 	const fullpallete = [0xfb29ff, 0xff2ea1, 0xff7866, 0xff6505, 0xffca42, 0xd3ff42, 0x66ff9, 0x0ed8a2, 0x0db4ce, 0x0461f6, 0xba7ef6];
 
-	const pallete = [0xfe8fb6, 0x8d83a7, 0xeeb4ac, 0xfff25f, 0x8bd15c, 0x57719b];
+	const pallete = [0xfb29ff, 0xff2ea1, 0x6f7866, 0x35e214, 0x0db4ce, 0x0461f6];
+	  
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
-	// /* BLOB SPHERE */
-	// var colorete = new THREE.Color(pallete[Math.floor(Math.random() * pallete.length)]);
-	// this.customMaterial = shadermaterial.clone();
-	// this.customMaterial.fragmentShader = document.getElementById('sphereFragmentShader').textContent
-	// this.customMaterial.uniforms.color.value = new THREE.Vector3(colorete.r, colorete.g, colorete.b);
-	// var esfera = new THREE.Mesh( new THREE.SphereGeometry(5, 32, 32), this.customMaterial);
-	// esfera.position.set(x,y+2,z);
-	// scene.add(esfera);
-
-	/* FADED SPRITE */
 	var colorete = new THREE.Color(pallete[Math.floor(Math.random() * pallete.length)]);
-
-	var spriteMat = new THREE.SpriteMaterial({
-		map: makeGlowTexture( colorete ),
-		// blending: THREE.AdditiveBlending,
-		depthWrite: false,
-		transparent: true,
-		fog: true
-	});
-	var esfera = new THREE.Sprite( spriteMat );
-	esfera.position.set( x, y+2, z );
-	esfera.scale.set( 40, 40, 1 );   // blob size, tune
-	scene.add( esfera );
+	// no shader. plain material, low seg for SVG
+	this.customMaterial = new THREE.MeshBasicMaterial( { color: colorete } );
+	var esfera = new THREE.Mesh( new THREE.SphereGeometry(5, 12, 12), this.customMaterial);
+	esfera.position.set(x,y+2,z);
+	scene.add(esfera);
 }
 
 function createSoundObject(position, blob) {
@@ -236,7 +198,7 @@ function createSoundObject(position, blob) {
 }
 
 function init() {
-	/**  check compatibility for audio and graphics **/
+	/**  check compatibility for audio **/
 	try {
 		// webkit shim
 		window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -251,7 +213,7 @@ function init() {
 		alert('No web audio support in this browser!');
 	}
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+	// no Detector.webgl check. SVG not need WebGL
 
     
     navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
@@ -281,45 +243,26 @@ function createScene() {
 	scene.fog = new THREE.FogExp2( 0xCCE0CC, 0.0025 );
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
-	scene.add( light );
-	ambientLight = new THREE.AmbientLight( 0xff5555 , 0.5);
-	scene.add(ambientLight);
-	
-	shadermaterial = new THREE.ShaderMaterial({side: THREE.DoubleSide,
-		uniforms: { 
-			amp: {
-				type: "f",
-				value: 0.0
-			},
-			sync:{
-				type: "f",
-				value: 0.0
-			},
-			time: { 
-				type: "f",
-				value: 0.1
-			},
-			color: {
-				type: "v3",
-				value: new THREE.Color(0xff0000)
-			}
-		},
-		vertexShader: document.getElementById('vertexShader2').textContent,
-		fragmentShader: document.getElementById('fragmentShader2').textContent
-	} );
-	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 100, 100), shadermaterial);
+	// scene.add( light );
+	ambientLight = new THREE.AmbientLight( 0x00f555 , 0.5);
+	// scene.add(ambientLight);
 
-	var material_wireframe = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLineWidth: 1 } );
+	// no shader. big toggle sphere plain, LOW seg (SVG choke on 100x100)
+	var skyMat = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.BackSide, wireframe: true } );
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(1000, 16, 16), skyMat);
+
+	var material_wireframe = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1 } );
 	mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 50, 50 ), material_wireframe );
 	mesh.position.y = 0.1;
 	mesh.rotation.x = - Math.PI /2;
+    // scene.add( mesh );
 
-	var grid = new THREE.GridHelper( 500, 25 );
-	grid.setColors( 0xacc1ac, 0xacc1ac );
+	var grid = new THREE.GridHelper( 500, 25,  );
+	grid.setColors( 0x0CF02C, 0x0C2F2C );
 	scene.add( grid );
 	
-	// renderer setup and adding to HTML
-	renderer = new THREE.WebGLRenderer( { clearColor: 0xCCE0CC, clearAlpha: 1, antialias: true } );
+	// SVG renderer setup
+	renderer = new THREE.SVGRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0xCCE0CC, 1 );
 	container.innerHTML = "";
@@ -364,8 +307,7 @@ function render() {
 		camera.position.y = 20;
 	}
 
-	shadermaterial.uniforms[ 'time' ].value = .0005 * ( Date.now() - start );
-	shadermaterial.uniforms[ 'amp' ].value = ( Date.now() - start ) / 70 ;
+	// no shader uniforms to update
 
 	var m = camera.matrix;
 

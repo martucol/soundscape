@@ -15,16 +15,17 @@
 
 		<div id="landing">
 
- 			<p>WASD / Mouse - Move around</p>
- 			<p>R / F - Up / Down</p>
-			<p><button disabled id="record" class="boton"><i class="fa fa-circle" aria-hidden="true"></i></button> - Start Recording </p>
-			<p><button disabled id="stop" class="boton"><i class=" fa fa-stop" aria-hidden="true"></i></button> - Stop Recording </p>
-			<p>Once you finish recording, the recorded sound will stay looping in that place.</p>
-			<p>Use headphones for a better experience :)</p>
-			<p>This site was built by <a href="https://mariamartina.com"  target="_blank">maria martina</a> using <a href="https://threejs.org/examples/#misc_sound" target="_blank">three.js</a> and 
+ 			<p>WASD / Mouse - move around</p>
+ 			<p>R / F - up / down</p>
+			<p><button disabled id="record" class="boton"><i class="fa fa-circle" aria-hidden="true"></i></button> - start Recording </p>
+			<p><button disabled id="stop" class="boton"><i class=" fa fa-stop" aria-hidden="true"></i></button> - stop Recording </p>
+			<p>once you finish recording, the recorded sound will stay looping in that place.</p>
+			<p>use headphones for a better experience :)</p>
+			<p>this site was built by <a href="https://mariamartina.com"  target="_blank">maria martina</a> </p>
+            <p>using <a href="https://threejs.org/examples/#misc_sound" target="_blank">three.js</a> and 
 			<a href="https://github.com/mattdiamond/Recorderjs" target="_blank">recorder.js</a></p>
 
-			<button onclick="cambioEstilo()" id="comenzar"> Start </button>
+			<button onclick="cambioEstilo()" id="comenzar"> start </button>
  		</div >
 
 		<div id="control" class="hidden">
@@ -55,8 +56,11 @@
 		<div id="container" ></div>
 
 		<script src="build/three.min.js"></script>
+        <script src="https://github.com/mrdoob/three.js/blob/r75/examples/js/renderers/SVGRenderer.js"></script>
 		<script src="build/FirstPersonControl.js"></script>
 		<script src="build/Detector.js"></script>
+        <!-- <script src="build/Projector.js"></script>
+        <script src="build/SVGRenderer.js"></script> -->
 		<script src="build/record.js"></script>
 		<script src="build/WebAudioRecorder.js"></script>
         <script type="x-shader/x-vertex" id="prevvertexshader">
@@ -266,21 +270,21 @@
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition , 1.0 );
     
             }
-            </script>
-            <script type="x-shader/x-vertex" id="prevfragmentShader">
-                varying vec2 vUv;
-                varying float noise;
-                uniform float time;
-    
-                void main() {
-                    vec2 position = -1.0 + 2.0 * vUv;
-    
-                    float red = abs(sin( noise* time / (position.y / sin(time))));
-                    float green = abs(sin( noise*time   / (position.x * sin(time))));
-                    float blue = abs(sin( noise*time  / (position.y * sin(time))));
-                    gl_FragColor = vec4(red, green, blue, 1.0);
-                }
-            </script>
+        </script>
+        <script type="x-shader/x-vertex" id="prevfragmentShader">
+            varying vec2 vUv;
+            varying float noise;
+            uniform float time;
+
+            void main() {
+                vec2 position = -1.0 + 2.0 * vUv;
+
+                float red = abs(sin( noise* time / (position.y / sin(time))));
+                float green = abs(sin( noise*time   / (position.x * sin(time))));
+                float blue = abs(sin( noise*time  / (position.y * sin(time))));
+                gl_FragColor = vec4(red, green, blue, 1.0);
+            }
+        </script>
 		<script type="x-shader/x-vertex" id="vertexShader2">
         //
         // GLSL textureless classic 3D noise "cnoise",
