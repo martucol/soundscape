@@ -1,4 +1,5 @@
 body {
+	--color-foreground: #373232;
 	background-color: #CCE0CC;
 	margin:auto;
 	overflow: hidden;
@@ -6,11 +7,11 @@ body {
 	text-align: center;
 	color: var(--color-foreground);
 	box-sizing: border-box;
-	--color-foreground: #2C202C
 }
 
 * {
 	font-family: "Fragment mono", monospaced;
+	box-sizing: border-box;
 }
 
 /*landing page*/
@@ -71,23 +72,20 @@ button:not(.boton--icono):hover, a:hover {
 
 /*controls bar*/
 #control {
-	color:#fff;
 	position: absolute;
-	top: 10px; 
-	width: 100%;
+	bottom: 0; 
+	width: 100vw;
 	z-index:100;
-	border-bottom: 1px solid var(--color-foreground);
-	padding: 1px 20px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-  
+	border-top: 1px solid var(--color-foreground);
+	padding: 0.5rem 4rem;
+	margin: auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .seccion {
-	width: 20%;
 	margin: 0;
-	padding-bottom: 15px;
 }
 .seccion p {
 	
@@ -108,7 +106,7 @@ button:not(.boton--icono):hover, a:hover {
 
 .boton {
 	border: 0px;	
-	background: #CCE0CC;
+	background: transparent;
 	color:var(--color-foreground);
 	text-align: center;
 	transition: all 300ms;

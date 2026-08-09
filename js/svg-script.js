@@ -240,7 +240,7 @@ function createScene() {
 	controls.noFly = true;
 	controls.lookVertical = false; 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xCCE0CC, 0.0025 );
+	scene.fog = new THREE.FogExp2( 0xA7AB9E, 0.0025 );
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
 	// scene.add( light );
@@ -264,7 +264,7 @@ function createScene() {
 	// SVG renderer setup
 	renderer = new THREE.SVGRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor( 0xCCE0CC, 1 );
+	renderer.setClearColor( 0xA7AB9E, 1 );
 	container.innerHTML = "";
 	container.appendChild( renderer.domElement );
 

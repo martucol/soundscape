@@ -199,8 +199,7 @@ var Sound = function ( sources, volume , x, y , z ) {
 		audioCtx.resume();
 	}
 	const fullpallete = [0xfb29ff, 0xff2ea1, 0xff7866, 0xff6505, 0xffca42, 0xd3ff42, 0x66ff9, 0x0ed8a2, 0x0db4ce, 0x0461f6, 0xba7ef6];
-
-	const pallete = [0xfe8fb6, 0x8d83a7, 0xeeb4ac, 0xfff25f, 0x8bd15c, 0x57719b];
+	const pallete = [0xB19477, 0xCFE7DD, 0xD3B4BD, 0xfff25f, 0xB8A665, 0xB197A3, 0xA3BECB, 0xB4AB5B, 0xD1A1B7];
 	sound.source.loop = true;
 	sound.panner.setPosition(x, y, z);
 	// /* BLOB SPHERE */
@@ -278,7 +277,7 @@ function createScene() {
 	controls.noFly = true;
 	controls.lookVertical = false; 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xCCE0CC, 0.0025 );
+	scene.fog = new THREE.FogExp2( 0xCCE0CC, 0.00125 );
 	light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 0, 0.5, 1 ).normalize();
 	scene.add( light );
@@ -314,10 +313,11 @@ function createScene() {
 	mesh.position.y = 0.1;
 	mesh.rotation.x = - Math.PI /2;
 
-	var grid = new THREE.GridHelper( 500, 25 );
-	grid.setColors( 0xacc1ac, 0xacc1ac );
+	// var grid = new THREE.GridHelper( 500, 25 );
+	// grid.setColors( 0xFFFFFF, 0xfFFFFF );
+	// scene.add( grid );
+	var grid = new DotGrid( 500, 25, 0.5, 0xffffff );
 	scene.add( grid );
-	
 	// renderer setup and adding to HTML
 	renderer = new THREE.WebGLRenderer( { clearColor: 0xCCE0CC, clearAlpha: 1, antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
